@@ -1,0 +1,53 @@
+R1:
+
+enable
+config terminal
+interface FastEthernet 0/0
+ip address 193.137.100.1 255.255.255.128
+no shutdown
+exit
+interface FastEthernet 0/1
+ip address 193.137.101.1 255.255.255.0
+no shutdown
+exit
+ip route 193.137.100.128 255.255.255.128 193.137.101.2
+ip route 10.5.2.0 255.255.255.192 193.137.101.3
+exit
+
+
+R2:
+
+enable
+config terminal
+interface FastEthernet 0/1
+ip address 193.137.100.129 255.255.255.128
+no shutdown
+exit
+interface FastEthernet 0/0
+ip address 193.137.101.2 255.255.255.0
+no shutdown
+exit
+ip route 193.137.100.0 255.255.255.128 193.137.101.1
+ip route 10.5.2.0 255.255.255.192 193.137.101.3
+exit
+
+
+R3:
+
+enable
+config t
+access-list 30 permit 10.5.0.0 0.0.0.255
+ip nat inside source list 30 interface f0/0 overload
+interface f0/0
+ip address 193.137.101.3 255.255.255.0
+ip nat outside
+no shutdown
+exit
+interface f0/1
+ip address 10.5.2.62 255.255.255.192
+ip nat inside
+no shutdown
+exit
+ip route 193.137.100.128 255.255.255.128 193.137.101.2
+ip route 193.137.100.0 255.255.255.128 193.137.101.1
+exit
